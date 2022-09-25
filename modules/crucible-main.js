@@ -107,7 +107,7 @@ Hooks.once("ready", function () {
 
   welcomeMessage();
   CrucibleUtility.ready()
-  CrucibleHotbar.init()
+  CrucibleHotbar.initDropbar()
 })
 
 /* -------------------------------------------- */
