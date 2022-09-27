@@ -343,7 +343,7 @@ export class CrucibleActor extends Actor {
 
   /* -------------------------------------------- */
   async incDecHP(formula) {
-    let dmgRoll = new Roll(formula).roll({ async: false })
+    let dmgRoll = new Roll(formula+"[crucible-orange]").roll({ async: false })
     await CrucibleUtility.showDiceSoNice(dmgRoll, game.settings.get("core", "rollMode"))
     let hp = duplicate(this.system.secondary.hp)
     hp.value = Number(hp.value) + Number(dmgRoll.total)

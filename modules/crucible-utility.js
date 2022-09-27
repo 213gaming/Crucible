@@ -10,7 +10,7 @@ const __color2RollTable = {
   blue: "Blue Armor Die", black: "Black Armor Die", green: "Green Armor Die", purple: "Purple Armor Die",
   white: "White Armor Die", red: "Red Armor Die", blackgreen: "Black & Green Armor Dice"
 }
-const __size2Dice = [ { nb: 0, dice: "d0" }, { nb: 5, dice: "d8" }, { nb: 3, dice: "d8" }, { nb: 2, dice: "d8" }, { nb: 1, dice: "d8" }, { nb: 1, dice: "d6" }, { nb: 1, noAddFirst: true, dice: "d6" }]
+const __size2Dice = [{ nb: 0, dice: "d0" }, { nb: 5, dice: "d8" }, { nb: 3, dice: "d8" }, { nb: 2, dice: "d8" }, { nb: 1, dice: "d8" }, { nb: 1, dice: "d6" }, { nb: 1, noAddFirst: true, dice: "d6" }]
 
 /* -------------------------------------------- */
 export class CrucibleUtility {
@@ -50,8 +50,28 @@ export class CrucibleUtility {
     Handlebars.registerHelper('mul', function (a, b) {
       return parseInt(a) * parseInt(b);
     })
+
   }
 
+  /*-------------------------------------------- */
+  static addDiceColors() {
+    game.dice3d.addColorset({
+      name: 'crucible-orange',
+      category: "crucible",
+      foreground: '#9F8003',
+      background: "#FFA500",
+      visibility: 'visible'
+    }, "preferred");
+
+    game.dice3d.addColorset({
+      name: 'crucible-purple',
+      category: "crucible",
+      foreground: '#9F8003',
+      background: "#800080",
+      visibility: 'visible'
+    }, "preferred");
+  }
+  
   /*-------------------------------------------- */
   static upperFirst(text) {
     if (typeof text !== 'string') return text
@@ -80,6 +100,8 @@ export class CrucibleUtility {
 
     const rollTables = await CrucibleUtility.loadCompendium("fvtt-crucible-rpg.rolltables")
     this.rollTables = rollTables.map(i => i.toObject())
+
+    this.addDiceColors()
 
   }
 
@@ -338,14 +360,14 @@ export class CrucibleUtility {
   /* -------------------------------------------- */
   static getSuccessResult(rollData) {
     if (rollData.sumSuccess <= -3) {
-      if (rollData.attackRollData.weapon.system.isranged ) {
+      if (rollData.attackRollData.weapon.system.isranged) {
         return { result: "miss", fumble: true, hpLossType: "melee" }
       } else {
         return { result: "miss", fumble: true, attackerHPLoss: "2d3", hpLossType: "melee" }
       }
     }
     if (rollData.sumSuccess == -2) {
-      if (rollData.attackRollData.weapon.system.isranged ) {
+      if (rollData.attackRollData.weapon.system.isranged) {
         return { result: "miss", dangerous_fumble: true }
       } else {
         return { result: "miss", dangerous_fumble: true, attackerHPLoss: "1d3", hpLossType: "melee" }
@@ -537,16 +559,16 @@ export class CrucibleUtility {
 
     // ability/save/size => 0
     let diceFormula
-    let startFormula = "0d6cs>=5"
+    let startFormula = "0d6cs>=5[blue]"
     if (rollData.ability) {
-      startFormula = String(rollData.ability.value) + "d6cs>=5"
+      startFormula = String(rollData.ability.value) + "d6cs>=5[blue]"
     }
     if (rollData.save) {
-      startFormula = String(rollData.save.value) + "d6cs>=5"
+      startFormula = String(rollData.save.value) + "d6cs>=5[blue]"
     }
     if (rollData.sizeDice) {
-      let nb = rollData.sizeDice.nb + rollData.distanceBonusDice + this.getDiceFromCover(rollData.hasCover) + this.getDiceFromSituational(rollData.situational)       
-      startFormula = String(nb) + String(rollData.sizeDice.dice) + "cs>=5"
+      let nb = rollData.sizeDice.nb + rollData.distanceBonusDice + this.getDiceFromCover(rollData.hasCover) + this.getDiceFromSituational(rollData.situational)
+      startFormula = String(nb) + String(rollData.sizeDice.dice) + "cs>=5[blue]"
     }
     diceFormula = startFormula
 
@@ -561,7 +583,7 @@ export class CrucibleUtility {
         if (level > 7) { level = 7 }
       }
       rollData.skill.system.skilldice = __skillLevel2Dice[level]
-      diceFormula += "+" + String(rollData.skill.system.skilldice) + "cs>=5"
+      diceFormula += "+" + String(rollData.skill.system.skilldice) + "cs>=5[black]"
 
       if (rollData.skill.system.skilltype == "complex" && rollData.skill.system.level == 0) {
         rollData.complexSkillDisadvantage = true
@@ -570,15 +592,15 @@ export class CrucibleUtility {
 
       if (rollData.skill.system.isfeatdie) {
         rollData.hasFeatDie = true
-        diceFormula += "+ 1d10cs>=5"
+        diceFormula += "+ 1d10cs>=5[crucible-purple]"
       } else {
-        diceFormula += `+ 0d10cs>=5`
+        diceFormula += `+ 0d10cs>=5[crucible-purple]`
       }
       if (rollData.skill.system.bonusdice != "none") {
         rollData.hasBonusDice = rollData.skill.system.bonusdice
-        diceFormula += `+ ${rollData.hasBonusDice}cs>=5`
+        diceFormula += `+ ${rollData.hasBonusDice}cs>=5[black]`
       } else {
-        diceFormula += `+ 0d6cs>=5`
+        diceFormula += `+ 0d6cs>=5[black]`
       }
     } else {
       diceFormula += `+ 0d8cs=>5 + 0d10cs>=5 + 0d6cs>=5`
@@ -587,20 +609,20 @@ export class CrucibleUtility {
     // advantage => 8
     let advFormula = "+ 0d8cs>=5"
     if (rollData.advantage == "advantage1" || rollData.forceAdvantage) {
-      advFormula = "+ 1d8cs>=5"
+      advFormula = "+ 1d8cs>=5[green]"
     }
     if (rollData.advantage == "advantage2") {
-      advFormula = "+ 2d8cs>=5"
+      advFormula = "+ 2d8cs>=5[green]"
     }
     diceFormula += advFormula
 
     // disadvantage => 10
     let disFormula = "- 0d8cs>=5"
     if (rollData.disadvantage == "disadvantage1" || rollData.forceDisadvantage) {
-      disFormula = "- 1d8cs>=5"
+      disFormula = "- 1d8cs>=5[red]"
     }
     if (rollData.disadvantage == "disadvantage2") {
-      disFormula = "- 2d8cs>=5"
+      disFormula = "- 2d8cs>=5[red]"
     }
     diceFormula += disFormula
 
@@ -620,7 +642,7 @@ export class CrucibleUtility {
 
     // shield => 14
     if (rollData.useshield && rollData.shield) {
-      diceFormula += "+ 1" + String(rollData.shield.system.shielddie) + "cs>=5"
+      diceFormula += "+ 1" + String(rollData.shield.system.shielddie) + "cs>=5[yellow]"
     } else {
       diceFormula += " + 0d6cs>=5"
     }
