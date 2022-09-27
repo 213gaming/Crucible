@@ -53,6 +53,8 @@ export class CrucibleActorSheet extends ActorSheet {
       encCapacity: this.actor.getEncumbranceCapacity(),
       saveRolls: this.actor.getSaveRoll(),
       conditions: this.actor.getConditions(),
+      description: await TextEditor.enrichHTML(this.object.system.biodata.description, {async: true}),
+      notes: await TextEditor.enrichHTML(this.object.system.biodata.notes, {async: true}),
       containersTree: this.actor.containersTree,
       encCurrent: this.actor.encCurrent,
       options: this.options,

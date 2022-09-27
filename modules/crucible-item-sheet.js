@@ -65,6 +65,7 @@ export class CrucibleItemSheet extends ItemSheet {
       cssClass: this.isEditable ? "editable" : "locked",
       weaponSkills: CrucibleUtility.getWeaponSkills(),
       shieldSkills: CrucibleUtility.getShieldSkills(),
+      description: await TextEditor.enrichHTML(this.object.system.description, {async: true}),
       data: itemData,
       limited: this.object.limited,
       options: this.options,
