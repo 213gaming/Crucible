@@ -4,16 +4,20 @@ import { CrucibleUtility } from "./crucible-utility.js";
 import { CrucibleRollDialog } from "./crucible-roll-dialog.js";
 
 /* -------------------------------------------- */
+const __saveFirstToKey = { r: "reflex", f: "fortitude", w: "willpower"}
+
+/* -------------------------------------------- */
 export class CrucibleCommands {
 
   static init() {
     if (!game.system.cruciblerpg.commands) {
       const crucibleCommands = new CrucibleCommands();
-      //crucibleCommands.registerCommand({ path: ["/char"], func: (content, msg, params) => crucibleCommands.createChar(msg), descr: "Create a new character" });
-      //crucibleCommands.registerCommand({ path: ["/pool"], func: (content, msg, params) => crucibleCommands.poolRoll(msg), descr: "Generic Roll Window" });
+      crucibleCommands.registerCommand({ path: ["/rtarget"], func: (content, msg, params) => CrucibleCommands.rollTarget(msg, params), descr: "Launch the target roll window" });
+      crucibleCommands.registerCommand({ path: ["/rsave"], func: (content, msg, params) => CrucibleCommands.rollSave(msg, params), descr: "Performs a save roll" });
       game.system.cruciblerpg.commands = crucibleCommands;
     }
   }
+
   constructor() {
     this.commandsTable = {};
   }
@@ -100,18 +104,41 @@ export class CrucibleCommands {
   static _chatAnswer(msg, content) {
     msg.whisper = [game.user.id];
     msg.content = content;
-    ChatMessage.create(msg);    
+    ChatMessage.create(msg);
   }
 
   /* -------------------------------------------- */
-  async poolRoll( msg) {
-    let rollData = CrucibleUtility.getBasicRollData()
-    rollData.alias = "Dice Pool Roll", 
-    rollData.mode  = "generic"
-    rollData.title = `Dice Pool Roll`;
-    
-    let rollDialog = await CrucibleRollDialog.create( this, rollData);
-    rollDialog.render( true );
+  static rollTarget(msg, params) {
+    const speaker = ChatMessage.getSpeaker()
+    let actor
+    if (speaker.token) actor = game.actors.tokens[speaker.token]
+    if (!actor) actor = game.actors.get(speaker.actor)
+    if (!actor) {
+      return ui.notifications.warn(`Select your actor to run the macro`)
+    }
+    actor.rollDefenseRanged()
+  }
+
+  /* -------------------------------------------- */
+  static rollSave(msg, params) {
+    console.log(msg, params)
+    if ( params.length == 0) {
+      ui.notifications.warn("/rsave command error : syntax is /rsave reflex, /rsave fortitude or /rsave willpower")
+      return
+    }
+    let saveKey = params[0].toLowerCase()
+    if ( saveKey.length > 0 && (saveKey[0] == "r" || saveKey[0] == "f" || saveKey[0] == "w")) {
+      const speaker = ChatMessage.getSpeaker()
+      let actor
+      if (speaker.token) actor = game.actors.tokens[speaker.token]
+      if (!actor) actor = game.actors.get(speaker.actor)
+      if (!actor) {
+        return ui.notifications.warn(`Select your actor to run the macro`)
+      }
+      actor.rollSave( __saveFirstToKey[saveKey[0]] )  
+    } else {
+      ui.notifications.warn("/rsave syntax error : syntax is /rsave reflex, /rsave fortitude or /rsave willpower")
+    }
   }
 
 }

@@ -16,6 +16,7 @@ import { CrucibleUtility } from "./crucible-utility.js";
 import { CrucibleCombat } from "./crucible-combat.js";
 import { CrucibleItem } from "./crucible-item.js";
 import { CrucibleHotbar } from "./crucible-hotbar.js"
+import { CrucibleCommands } from "./crucible-commands.js"
 
 /* -------------------------------------------- */
 /*  Foundry VTT Initialization                  */
@@ -27,7 +28,8 @@ Hooks.once("init", async function () {
   console.log(`Initializing Crucible RPG`);
   
   game.system.cruciblerpg = {
-    CrucibleHotbar
+    CrucibleHotbar,
+    CrucibleCommands
   }
 
   /* -------------------------------------------- */
@@ -107,7 +109,9 @@ Hooks.once("ready", function () {
 
   welcomeMessage();
   CrucibleUtility.ready()
+  CrucibleCommands.init()
   CrucibleHotbar.initDropbar()
+
 })
 
 /* -------------------------------------------- */
@@ -117,7 +121,7 @@ Hooks.on("chatMessage", (html, content, msg) => {
   if (content[0] == '/') {
     let regExp = /(\S+)/g;
     let commands = content.match(regExp);
-    if (game.system.crucible.commands.processChatCommand(commands, content, msg)) {
+    if (game.system.cruciblerpg.commands.processChatCommand(commands, content, msg)) {
       return false;
     }
   }
