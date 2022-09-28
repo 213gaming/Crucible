@@ -51,6 +51,28 @@ export class CrucibleUtility {
       return parseInt(a) * parseInt(b);
     })
 
+    this.gameSettings()
+
+  }
+
+  /*-------------------------------------------- */
+  static gameSettings() {
+    /*game.settings.register("fvtt-crucible-rpg", "dice-color-skill", {
+      name: "Dice color for skills",
+      hint: "Set the dice color for skills",
+      scope: "world",
+      config: true,
+      requiresReload: true ,
+      default: "#101010",
+      type: String
+    })
+
+    Hooks.on('renderSettingsConfig', (event) => {
+      const element = event.element[0].querySelector(`[name='fvtt-crucible-rpg.dice-color-skill']`)
+      if (!element) return
+      // Replace placeholder element
+      console.log("Element Found !!!!")
+    })    */
   }
 
   /*-------------------------------------------- */
@@ -68,6 +90,14 @@ export class CrucibleUtility {
       category: "crucible",
       foreground: '#9F8003',
       background: "#800080",
+      visibility: 'visible'
+    }, "preferred");
+
+    game.dice3d.addColorset({
+      name: 'crucible-darkgreen',
+      category: "crucible",
+      foreground: '#9F8003',
+      background: "#006400",
       visibility: 'visible'
     }, "preferred");
   }
@@ -609,10 +639,10 @@ export class CrucibleUtility {
     // advantage => 8
     let advFormula = "+ 0d8cs>=5"
     if (rollData.advantage == "advantage1" || rollData.forceAdvantage) {
-      advFormula = "+ 1d8cs>=5[green]"
+      advFormula = "+ 1d8cs>=5[crucible-darkgreen]"
     }
     if (rollData.advantage == "advantage2") {
-      advFormula = "+ 2d8cs>=5[green]"
+      advFormula = "+ 2d8cs>=5[crucible-darkgreen]"
     }
     diceFormula += advFormula
 

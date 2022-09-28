@@ -37,16 +37,6 @@ Hooks.once("init", async function () {
   CrucibleUtility.preloadHandlebarsTemplates();
 
   /* -------------------------------------------- */
-  game.settings.register("fvtt-crucible-rpg", "dice-max-level", {
-    name: "Maximum level value for dices lists",
-    hint: "Set the maximum level value for dices lists",
-    scope: "world",
-    config: true,
-    default: 20,
-    type: Number
-  })
-
-  /* -------------------------------------------- */
   // Set an initiative formula for the system 
   CONFIG.Combat.initiative = {
     formula: "1d6",
